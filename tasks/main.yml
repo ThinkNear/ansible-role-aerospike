@@ -1,0 +1,43 @@
+---
+- name: Create download directory.
+  file:
+    path: "{{ aerospike_source_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Download Aerospike package.
+  unarchive: src={{ aerospike_download_url }} dest={{ aerospike_source_directory }} copy=no
+
+- name: Install package from rpm.
+  yum: name={{ aerospike_source_directory }}/{{ aerospike_package_name }}/{{ item }} state=present
+  with_items:
+    - "{{ aerospike_rpm_name }}"
+    - "{{ aerospike_tools_rpm_name }}"
+  when: not aerospike_version_downgrade
+  notify:
+    - restart aerospike
+    - wait for cluster membership
+
+- name: Force install rpm when version downgrade.
+  command: rpm -i {{ aerospike_source_directory }}/{{ aerospike_package_name }}/{{ item }} --force
+  with_items:
+    - "{{ aerospike_rpm_name }}"
+    - "{{ aerospike_tools_rpm_name }}"
+  when: aerospike_version_downgrade
+  notify:
+    - restart aerospike
+    - wait for cluster membership
+
+- name: Place Aerospike configuration file.
+  template: src=aerospike.conf.j2 dest=/etc/aerospike/aerospike.conf force={{ aerospike_use_managed_conf }}
+  when: aerospike_use_managed_conf
+  notify:
+    - restart aerospike
+    - wait for cluster membership
+
+- name: Ensure Aerospike is started and enabled on boot.
+  service: state=running enabled={{ aerospike_enabled_on_boot }} name=aerospike
+  notify:
+    - wait for cluster membership

@@ -1,0 +1,95 @@
+#jinja2: lstrip_blocks: True
+# Aerospike database configuration file for deployments using mesh heartbeats.
+
+service {
+    user root
+    group root
+    paxos-single-replica-limit 1 # Number of nodes where the replica count is automatically reduced to 1.
+    pidfile /var/run/aerospike/asd.pid
+    service-threads {{ aerospike_service_threads }}
+    transaction-queues {{ aerospike_transaction_queues }}
+    transaction-threads-per-queue {{ aerospike_transaction_threads }}
+    proto-fd-max 15000
+}
+
+logging {
+    # Log file must be an absolute path.
+    file /var/log/aerospike/aerospike.log {
+        context any info
+    }
+}
+
+network {
+    service {
+        address any
+        port 3000
+    }
+
+    heartbeat {
+        mode mesh
+        port 3002 # Heartbeat port for this node.
+
+         # List one or more other nodes, one ip-address & port per line:
+        address any
+    {% for ip in aerospike_mesh_seed_addresses %}
+        mesh-seed-address-port {{ ip }} 3002
+    {% endfor %}
+
+        interval 250
+        timeout 10
+    }
+
+    fabric {
+        port 3001
+    }
+
+    info {
+        port 3003
+    }
+}
+
+{% for namespace in aerospike_namespaces %}
+namespace {{ namespace.name }} {
+        replication-factor 2
+    {% if namespace.memory_size is defined %}
+        memory-size {{ namespace.memory_size }}
+    {% endif  %}
+        high-water-memory-pct 70
+        high-water-disk-pct 60
+        default-ttl 4d # 30 days, use 0 to never expire/evict.
+
+    {% if namespace.storage_engine is defined %}
+        storage-engine device {
+        {% if namespace.storage_engine.devices is defined %}
+            {% for device in namespace.storage_engine.devices %}
+                device {{ device }}
+            {% endfor %}
+        {% endif %}
+        {% if namespace.storage_engine.files is defined %}
+            {% for file in namespace.storage_engine.files %}
+                file {{ file }}
+            {% endfor %}
+        {% endif %}
+        {% if namespace.storage_engine.filesize is defined %}
+                filesize {{ namespace.storage_engine.filesize }}
+        {% endif %}
+
+                # The 2 lines below optimize for SSD.
+        {% if namespace.storage_engine.scheduler_mode is defined %}
+                scheduler-mode {{ namespace.storage_engine.scheduler_mode }}
+        {% endif %}
+        {% if namespace.storage_engine.write_block_size is defined %}
+                write-block-size {{ namespace.storage_engine.write_block_size }}
+        {% endif %}
+
+                # Use the line below to store data in memory in addition to devices.
+        {% if namespace.storage_engine.data_in_memory is defined %}
+                data-in-memory {{ namespace.storage_engine.data_in_memory | lower }}
+        {% else %}
+                # data-in-memory true
+        {% endif %}
+        }
+    {% else %}
+        storage-engine memory
+    {% endif %}
+}{% endfor %}
