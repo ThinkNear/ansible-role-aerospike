@@ -1,0 +1,14 @@
+---
+- name: run aerospike
+  service: name=aerospike state=running
+
+- name: restart aerospike
+  service: name=aerospike state=restarted
+
+- name: wait for cluster membership
+  command: asinfo
+  register: asinfo
+  until: asinfo.stdout.find("cluster_size={{ aerospike_cluster_size }}") != -1
+  retries: 150
+  delay: 6
+  ignore_errors: true
