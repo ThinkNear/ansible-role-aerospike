@@ -1,0 +1,25 @@
+---
+aerospike_version_downgrade: false
+aerospike_use_managed_conf: true
+aerospike_enabled_on_boot: true
+aerospike_overwrite_conf: true
+aerospike_version: 3.7.4
+aerospike_tools_version: 3.7.3
+aerospike_namespaces:
+  - name: default
+aerospike_source_directory:
+  /usr/local/src
+aerospike_download_url:
+  https://www.aerospike.com/download/server/{{ aerospike_version }}/artifact/el6
+aerospike_package_name:
+  aerospike-server-community-{{ aerospike_version }}-el6
+aerospike_rpm_name:
+  aerospike-server-community-{{ aerospike_version }}-1.el6.x86_64.rpm
+aerospike_tools_rpm_name:
+  aerospike-tools-{{ aerospike_tools_version }}-1.el6.x86_64.rpm
+aerospike_cluster_size: 1
+aerospike_service_threads: 4
+aerospike_transaction_queues: 4
+aerospike_transaction_threads: 4
+aerospike_mesh_seed_addresses:
+  - 127.0.0.1
