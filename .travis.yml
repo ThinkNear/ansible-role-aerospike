@@ -1,11 +1,17 @@
 ---
 sudo: required
+language: python
 
 env:
   - distribution: centos
     version: 7
     init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=/tmp/$(mktemp -d):/run"
+    SITE: test
+  - distribution: centos
+    version: 6
+    init: /sbin/init
+    run_opts: "--privileged"
     SITE: test
 
 services:
@@ -37,6 +43,6 @@ script:
 
   # Clean up
   - 'sudo docker stop "$(cat ${container_id})"'
-  
+
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

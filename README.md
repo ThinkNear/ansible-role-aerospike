@@ -2,7 +2,7 @@ Ansible Role: Aerospike
 =========
 
 [![Apache 2.0](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/DigitalSlideArchive/ansible-role-vips/master/LICENSE)
-[![Build Status](https://travis-ci.org/thinknear/ansible-role-aerospike.svg?branch=master)](https://travis-ci.org/thinknear/ansible-role-aerospike)
+[![Build Status](https://travis-ci.org/ThinkNear/ansible-role-aerospike.svg?branch=master)](https://travis-ci.org/ThinkNear/ansible-role-aerospike)
 
 An Ansible role that installs, configures, and runs Aerospike on RedHat and CentOS Linux.
 
@@ -10,6 +10,8 @@ Requirements
 ------------
 
 The server must run RedHat or CentOS.
+
+This requires Ansible v2.
 
 Role Variables
 --------------

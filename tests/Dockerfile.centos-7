@@ -1,9 +1,7 @@
 FROM centos:7
 
 # Install systemd -- See https://hub.docker.com/_/centos/
-RUN yum -y swap -- remove fakesystemd -- install systemd systemd-libs
-RUN yum -y update; yum clean all; \
-(cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
 rm -f /lib/systemd/system/multi-user.target.wants/*; \
 rm -f /etc/systemd/system/*.wants/*; \
 rm -f /lib/systemd/system/local-fs.target.wants/*; \
@@ -12,9 +10,9 @@ rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
 rm -f /lib/systemd/system/basic.target.wants/*; \
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-# Install Ansible
+# Install Ansible (use pip to install Ansible v2)
 RUN yum -y install epel-release
-RUN yum -y install git sudo python-pip python-devel
+RUN yum -y install git sudo python-pip python-devel gcc initscripts
 RUN yum clean all
 RUN pip install paramiko PyYAML Jinja2 httplib2 six ansible
 
@@ -22,6 +20,7 @@ RUN pip install paramiko PyYAML Jinja2 httplib2 six ansible
 RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 # Install Ansible inventory file
+RUN mkdir /etc/ansible/
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
 VOLUME ["/sys/fs/cgroup"]
