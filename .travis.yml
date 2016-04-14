@@ -6,7 +6,8 @@ env:
   - distribution: centos
     version: 7
     init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --volume=/tmp/$(mktemp -d):/run"
+    temp_dir: $(mktemp -d "${TMPDIR:-/tmp}zombie.XXXXXXXXX")
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup --volume=$(temp_dir):/run"
     SITE: test
   - distribution: centos
     version: 6
@@ -24,7 +25,7 @@ before_install:
   - 'sudo docker build --rm=true --file=tests/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible tests'
 
 script:
-  - container_id=$(mktemp)
+  - container_id=$(mktemp -t tmp.XXXXX)
   # Run container in detached state
   - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
 
