@@ -128,6 +128,33 @@ Example Playbook
       roles:
          - ThinkNear.aerospike
 
+Testing
+-------
+
+Travis runs the test playbook against Docker containers.
+
+To run the same tests locally:
+
+1. Install [Docker Toolbox](https://www.docker.com/products/docker-toolbox)
+
+2. Create a machine
+
+    ```sh
+    docker-machine create
+    ```
+
+3. Connect your shell to the new machine
+
+    ```sh
+    eval "$(docker-machine env default)"
+    ```
+
+4. Run the `docker_test.sh` script with the target platform.
+
+    ```sh
+    ./test/docker_test.sh centos7
+    ```
+
 License
 -------
 
