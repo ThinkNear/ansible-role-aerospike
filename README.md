@@ -1,5 +1,9 @@
-Ansible Role: Aerospike
-=========
+Deprecated
+==========
+
+This role is no longer supported. It is left public only as an example.
+
+## Ansible Role: Aerospike
 
 [![Apache 2.0](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/DigitalSlideArchive/ansible-role-vips/master/LICENSE)
 [![Build Status](https://travis-ci.org/ThinkNear/ansible-role-aerospike.svg?branch=master)](https://travis-ci.org/ThinkNear/ansible-role-aerospike)
